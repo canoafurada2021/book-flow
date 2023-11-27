@@ -3,8 +3,12 @@ header('Content-Type: application/json');
 
 include_once(__DIR__."/../model/Database.php");
 include_once(__DIR__."/../model/User.php");
-// include_once(__DIR__."/../configs/Auth.php");
-// $dsn = "mysql:host=localhost;dbname=book_flow;charset=utf8mb4";
+include_once(__DIR__."/../model/Book.php");
+
+ include_once(__DIR__."/../configs/Auth.php");
+
+
+ // $dsn = "mysql:host=localhost;dbname=book_flow;charset=utf8mb4";
 // $username = "root";
 // $password = "";
 // $options = [
@@ -67,8 +71,18 @@ include_once(__DIR__."/../model/User.php");
 // // Criando o usuário no banco de dados
 //     $User->create_user();
 
+// $Book = new Book();
 
+// $book_data = array(
+// 'name' => 'Memorias Póstumas de Brás Cubas',
+// 'author' => 'Machado de Assis',
+// 'genre' => 'Romance',
+// );
 
+// $Book-> set_name($book_data['name']);
+// $Book-> set_author($book_data['author']);
+// $Book-> set_genre($book_data['genre']);
+// $Book-> create_book();
 
 
 $response = ['status' => 'error', 'message' => 'Ocorreu um erro no login.'];
