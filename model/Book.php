@@ -6,6 +6,8 @@ class Book {
     private $name;
     private $author;
     private $genre;
+    private $imageData;
+    private $imageType;
 private $table_name = "book";
 
 
@@ -36,20 +38,37 @@ private $table_name = "book";
     public function set_genre($genre) {
         $this->genre = $genre;
     }
+
+
+    public function get_imageData() {
+        return $this->imageData;
+    }
+
+    public function set_imageData($imageData) {
+        $this->imageData = $imageData;
+    }
+
+    public function get_imageType() {
+        return $this->imageType;
+    }
+
+    public function set_imageType($imageType) {
+        $this->imageTypev = $imageType;
+    }
+
     public function to_array(){            
         return get_object_vars($this);    
       }
   
       public function get_table_name(){ return $this->table_name; }
 
-    public function create_book() {
+    public function create_book($data) {
         $Crud = new Crud();
 
-        echo "SQL Query: $query";
 
-        $book_data = $this->to_array(); // Você precisa implementar a função to_array() para a classe Book
+
         try {
-            return $Crud->create($table = $this->get_table_name(), $book_data);
+            return $Crud->create($table = $this->get_table_name(), $data);
         } catch (Exception $e) {
             throw new Exception("Erro ao criar livro: " . $e->getMessage());
         }

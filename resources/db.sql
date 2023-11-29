@@ -7,6 +7,7 @@ USE  `book_flow`;
 CREATE TABLE user(
 `id` INT NOT NULL AUTO_INCREMENT,
 `name` VARCHAR(255) NOT NULL,
+`login` VARCHAR(255) NOT NULL,
 `email` VARCHAR(255) NOT NULL,
 `password` VARCHAR(255) NOT NULL,
 `api_token` varchar(200) DEFAULT NULL COMMENT 'Token para autenticação de usuário',
@@ -19,5 +20,12 @@ CREATE TABLE book(
 `name` VARCHAR(255) NOT NULL,
 `author` VARCHAR(255) NOT NULL,
 `genre` VARCHAR(255) NOT NULL,
+`image_data` MEDIUMBLOB,
+`image_type` VARCHAR(255),
   PRIMARY KEY (`id`)
 );
+
+
+SELECT * FROM user;
+SELECT * FROM book;
+

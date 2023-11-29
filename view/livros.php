@@ -73,6 +73,8 @@
 
     <label for="genre">Gênero:</label>
     <input type="text" class="form-control" id="genre" name="genre" required><br>
+    <label for="image">Imagem:</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" required><br>
 
     <button type="submit" class="btn btn-primary">Salvar</button>
 </form>
@@ -117,7 +119,9 @@ bookForm.addEventListener('submit', async function (event) {
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                        <th>Imagem</th>
+
+                        <th>ID</th>
                             <th>Nome</th>
                             <th>Autor</th>
                             <th>Gênero</th>
@@ -132,10 +136,26 @@ $livro = new Book();
 $livros = $livro->list_books();
 foreach ($livros as $livro) {
     echo '<tr>';
+    // Verifica se há dados de imagem
+    if (!empty($livro['image_data']) && !empty($livro['image_type'])) {
+        $imageData = base64_encode($livro['image_data']);
+        $imageType = $livro['image_type'];
+        $imageSrc = "data:{$imageType};base64,{$imageData}";
+
+        // Exibe a imagem usando a tag img
+        echo '<td><img src="' . $imageSrc . '" alt="Imagem do Livro"  style="max-width: 70px; max-height: 70px;"></td>';
+    } else {
+        echo '<td>Sem imagem</td>';
+    }
+  
+  
     echo '<td>' . $livro['id'] . '</td>';
     echo '<td>' . $livro['name'] . '</td>';
     echo '<td>' . $livro['author'] . '</td>';
     echo '<td>' . $livro['genre'] . '</td>';
+
+  
+
     echo '</tr>';
 }
 ?>
@@ -152,92 +172,57 @@ foreach ($livros as $livro) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 function addBook() {
-    // Obtenha os valores do formulário
-    var name = document.getElementById("name").value;
-    var author = document.getElementById("author").value;
-    var genre = document.getElementById("genre").value;
 
-    // Crie um objeto FormData e adicione os dados do livro a ele
-    var formData = new FormData();
-    formData.append("name", name);
-    formData.append("author", author);
-    formData.append("genre", genre);
-    // Adicione outros campos conforme necessário
 
-const bookForm = document.getElementById('addBookForm');
-console.log("Name:", name);
-console.log("Author:", author);
-console.log("Genre:", genre);
+    const bookForm = document.getElementById('addBookForm');
 
-bookForm  .  addEventListener('submit', async function (event) {
-                event.preventDefault();
+bookForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-                const formData = new FormData(bookForm);
-                const response = await fetch('create_book.php', {
-                    method: 'POST',
-                    body: formData,
+    try {
+        const formData = new FormData(bookForm);
+        const response = await fetch('create_book.php', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Ocultar o modal
+                const addBookModal = new bootstrap.Modal(document.getElementById('addBookModal'));
+                addBookModal.hide();
+
+                // Exibir a mensagem de sucesso
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Livro criado com sucesso!',
+                    showConfirmButton: false,
+                    timer: 2000
                 });
 
-                const result = await response.json();
+                // Recarregar a lista de livros (substitua o código abaixo com a lógica real para atualizar a lista)
+                location.reload(); // Isso recarregará a página inteira; você pode querer usar uma abordagem mais eficiente, como AJAX, para carregar apenas os novos dados.
 
-                if (result.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Livro criado com sucesso!',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro na criação',
-                        text: result.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                }
-            });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro na criação',
+                    text: result.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        } else {
+            console.error('Erro na requisição:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+});
 
-
-    // Faça uma chamada AJAX para o backend
-    // $.ajax({
-    //     type: "POST",
-    //     url: "../view/php/create_book.php", // Substitua pelo caminho correto
-    //     data: formData,
-    //     processData: false, // Evita que o jQuery processe os dados
-    //     contentType: false, // Não defina automaticamente o cabeçalho Content-Type
-    //     success: function (response) {
-    //         // Verifique a resposta do backend
-    //         if (response.success) {
-    //             // Feche o modal de adição
-    //             $('#addBookModal').modal('hide');
-
-    //             // Exiba o modal de sucesso usando SweetAlert
-    //             Swal.fire({
-    //                 icon: 'success',
-    //                 title: 'Livro Adicionado!',
-    //                 showConfirmButton: false,
-    //                 timer: 1500
-    //             });
-
-    //             // Atualize a tabela de livros (opcional)
-    //             // Você pode recarregar os dados da tabela para exibir o novo livro
-    //         } else {
-    //             // Exiba uma mensagem de erro, se necessário
-    //             console.error("Erro ao criar livro:", response.message);
-    //         }
-    //     },
-    //     error: function (xhr, status, error) {
-    //         // Log detalhes sobre o erro
-    //         console.error("Erro ao fazer a requisição AJAX:");
-    //         console.log("Status:", status);
-    //         console.log("Error:", error);
-    //         console.log("Response:", xhr.responseText);
-    //     }
-    // });
 }
-
-
     </script>
 </body>
 </html>

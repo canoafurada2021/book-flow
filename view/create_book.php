@@ -3,9 +3,8 @@
 
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Certifique-se de incluir sua classe Book aqui
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $livro = new Book();
     
     // Certifique-se de validar e sanitizar os dados do formulário antes de usá-los
@@ -14,15 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $author = trim($_POST['author']);
         $genre = trim($_POST['genre']);
 
-        echo 'Name: ' . $name . '<br>';
-        echo 'Author: ' . $author . '<br>';
-        echo 'Genre: ' . $genre . '<br>';
         // Verifique se os campos não estão vazios
         if (!empty($name) && !empty($author) && !empty($genre)) {
             try {
-                $result = $livro->create_book(['name' => $name, 'author' => $author, 'genre' => $genre]);
+                // Verifique se uma imagem foi enviada
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    // Obtenha dados da imagem
+                    $imageData = file_get_contents($_FILES['image']['tmp_name']);
+                    $imageType = $_FILES['image']['type'];
 
-                echo $result;
+                    // Defina os dados da imagem no objeto livro
+                    $livro->set_imageData($imageData);
+                    $livro->set_imageType($imageType);
+                }
+
+                // Crie o livro no banco de dados
+                $result = $livro->create_book(['name' => $name, 'author' => $author, 'genre' => $genre, 'image_data'=> $imageData, 'image_type'=> $imageType]);
+
                 if ($result) {
                     // Se a criação for bem-sucedida, envie uma resposta de sucesso
                     echo json_encode(['status' => 'success']);
