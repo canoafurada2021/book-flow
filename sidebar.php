@@ -1,4 +1,5 @@
 <div id="sidebar">
+
     <style>
         /* Adicione seu CSS personalizado aqui */
         #logo {
@@ -45,7 +46,7 @@
 
     <ul class="nav flex-column">
         <li class="nav-item">
-            <a class="nav-link active" href="#">
+            <a class="nav-link active" href="../view/home_page.php">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
@@ -55,7 +56,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="..view/usuarios.php">
                 <i class="fas fa-user"></i> Usuários
             </a>
         </li>
@@ -65,4 +66,6 @@
             </a>
         </li>
     </ul>
+
 </div>
+

@@ -65,8 +65,6 @@ private $table_name = "book";
     public function create_book($data) {
         $Crud = new Crud();
 
-
-
         try {
             return $Crud->create($table = $this->get_table_name(), $data);
         } catch (Exception $e) {

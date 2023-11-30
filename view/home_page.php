@@ -18,7 +18,13 @@
             height: 100vh;
         }
 
-    
+        #sidebar {
+            width: 240px;
+            padding: 20px;
+            background-color: rgb(248, 242, 253);
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+        }
 
         #content {
             flex: 1;
@@ -36,17 +42,34 @@
             height: auto;
         }
 
-        #sidebar {
-            width: 240px;
-            padding: 20px;
-            background-color: rgb(248, 242, 253);
-            border-right: 1px solid #dee2e6;
-            overflow-y: auto;
+        #title {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px;
+            border-radius: 20px; /* Adiciona cantos arredondados */
+            transition: background-color 0.3s;
+            color: rgb(67, 1, 108); /* Cor do texto */
+        }
+
+        .nav-link:hover {
+            background-color: #f8f8f8; /* Altera a cor de fundo ao passar o mouse */
+            border: 1px solid #ccc; /* Adiciona uma borda ao redor do item ao passar o mouse */
+
         }
     </style>
 </head>
 <body>
     <div id="app">
+
         <div id="sidebar">
             <?php include '../sidebar.php'; ?>
         </div>
@@ -79,9 +102,12 @@
             </div>
         </div>
     </div>
+
     <!-- Após a inclusão do Bootstrap e do Chart.js -->
 <script>
-    // Dados do primeiro gráfico
+
+
+// Dados do primeiro gráfico
     var data1 = {
         labels: ['Categoria A', 'Categoria B', 'Categoria C'],
         datasets: [{
@@ -137,6 +163,10 @@
             borderWidth: 1
         }]
     };
+
+
+
+
 
     // Configurações do segundo gráfico
     var options2 = {

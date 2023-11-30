@@ -4,7 +4,7 @@ class Crud {
     private $config = [
         "dbdriver" => "mysql", 
         "dbuser" => "root",
-        "dbpass" => "",
+        "dbpass" => "aluno",
         "dbname" => "book_flow",
         "dbhost" => "localhost",
         "charset" => "utf8mb4"
