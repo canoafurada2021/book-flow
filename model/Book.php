@@ -118,6 +118,42 @@ private $table_name = "book";
 
         return $book;
     }
+
+
+    public function delete_book($book_id) {
+        $Crud = new Crud();
+        $where = 'id = :id';
+        $bind = [':id' => $book_id];
+
+        try {
+            return $Crud->delete($table = $this->get_table_name(), $where, $bind);
+        } catch (Exception $e) {
+            throw new Exception("Erro ao excluir livro: " . $e->getMessage());
+        }
+    }
+    public function update_book($book_id, $data) {
+        $Crud = new Crud();
+        $where = 'id = :id';
+        $bind = [':id' => $book_id];
+    
+        try {
+            return $Crud->update($table = $this->get_table_name(), $data, $where, $bind);
+        } catch (Exception $e) {
+            throw new Exception("Erro ao atualizar livro: " . $e->getMessage());
+        }
+    }
+    public function get_book_details($book_id) {
+        $Crud = new Crud();
+        $where = 'id = :id';
+        $bind = [':id' => $book_id];
+        $field_list = "*";
+    
+        $book = $Crud->read($table = $this->get_table_name(), $where, $bind, $fields = $field_list);
+    
+        return $book;
+    }
+    
+
 }
 
 ?>

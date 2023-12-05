@@ -57,6 +57,15 @@
             top: 20px;
             right: 20px;
         }
+        #noBooksMessage {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -91,9 +100,13 @@
 
     <label for="author">Autor:</label>
     <input type="text" class="form-control" id="author" name="author" required><br>
-
     <label for="genre">Gênero:</label>
-    <input type="text" class="form-control" id="genre" name="genre" required><br>
+<select class="form-control" id="genre" name="genre" required>
+    <option value="Ficção">Ficção</option>
+    <option value="Não Ficção">Não Ficção</option>
+    <option value="Romance">Romance</option>
+    <!-- Adicione mais opções conforme necessário -->
+</select><br>
     <label for="image">Imagem:</label>
                 <input type="file" class="form-control" id="image" name="image" accept="image/*" required><br>
 
@@ -107,39 +120,143 @@
                 </div>
 
                 <?php
-                include_once(__DIR__."/../model/Book.php");
+include_once(__DIR__."/../model/Book.php");
 
-                $livro = new Book(); 
-                $livros = $livro->list_books();
+$livro = new Book(); 
+$livros = $livro->list_books();
 
-                foreach ($livros as $livro) {
-                    echo '<div class="bookCard">';
-                    // Verifica se há dados de imagem
-                    if (!empty($livro['image_data']) && !empty($livro['image_type'])) {
-                        $imageData = base64_encode($livro['image_data']);
-                        $imageType = $livro['image_type'];
-                        $imageSrc = "data:{$imageType};base64,{$imageData}";
+if (empty($livros)) {
+    echo '<p>Nenhum livro cadastrado no sistema</p>';
+} else {
+    foreach ($livros as $livro) {
+        echo '<div class="bookCard livro">';
+        // Verifica se há dados de imagem
+        if (!empty($livro['image_data']) && !empty($livro['image_type'])) {
+            $imageData = base64_encode($livro['image_data']);
+            $imageType = $livro['image_type'];
+            $imageSrc = "data:{$imageType};base64,{$imageData}";
+    
+            // Exibe a imagem usando a tag img
+            echo '<img class="bookImage" src="' . $imageSrc . '" alt="Imagem do Livro">';
+        } else {
+            echo '<p>Sem imagem</p>';
+        }
+    
+        echo '<h5 class="title">' . $livro['name'] . '</h5>';
+        echo '<p class="author">Autor: ' . $livro['author'] . '</p>';
+        echo '<p class="genre">Gênero: ' . $livro['genre'] . '</p>';
+        echo '<div class="bookButtons">';
+        echo '<button class="btn btn-primary" onclick="editBook(' . $livro['id'] . ')"><i class="fas fa-edit"></i></button>';
+        echo '<button class="btn btn-danger" onclick="confirmDeleteBook(' . $livro['id'] . ')"><i class="fas fa-trash-alt"></i></button>';
+        echo '</div>';
+        echo '</div>';
+    }
+}
+?>
 
-                        // Exibe a imagem usando a tag img
-                        echo '<img class="bookImage" src="' . $imageSrc . '" alt="Imagem do Livro">';
-                    } else {
-                        echo '<p>Sem imagem</p>';
-                    }
-
-                    echo '<h5>' . $livro['name'] . '</h5>';
-                    echo '<p>Autor: ' . $livro['author'] . '</p>';
-                    echo '<p>Gênero: ' . $livro['genre'] . '</p>';
-                    echo '</div>';
-                }
-                ?>
             </div>
         </div>
     </div>
 
 <script>
+function editBook(bookId) {
+    // Chama a função para obter detalhes do livro pelo ID
+    fetch('get_book_details.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'bookId': bookId,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Exibe um modal de edição com os detalhes do livro
+        if (data.status === 'success') {
+            const bookDetails = data.book;
+            openEditModal(bookDetails);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro na obtenção de detalhes do livro',
+                text: data.message,
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição AJAX:', error);
+    });
+}
+
+
+
+// Função para exclusão de livro
+function confirmDeleteBook(bookId) {
+        // Chama a função de exclusão do livro no lado do servidor
+        fetch('delete_book.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'bookId': bookId,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Exibe uma mensagem de sucesso ou erro
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Livro excluído com sucesso!',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                setTimeout(() => {
+            // Recarregar a lista de livros (substitua o código abaixo com a lógica real para atualizar a lista)
+            // Isso recarregará a página inteira; você pode querer usar uma abordagem mais eficiente, como AJAX, para carregar apenas os novos dados.
+            location.reload();
+        }, 2000);
+
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro na exclusão',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição AJAX:', error);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('search');
+            const livros = document.querySelectorAll('.livro');
+
+            searchInput.addEventListener('input', function () {
+                const searchValue = searchInput.value.toLowerCase();
+
+                livros.forEach(function (livro) {
+                    const title = livro.querySelector('h5').innerText.toLowerCase();
+                    const author = livro.querySelector('.author').innerText.toLowerCase();
+                    const genre = livro.querySelector('.genre').innerText.toLowerCase();
+
+                    // Verifica se qualquer um dos campos corresponde à pesquisa
+                    const isMatch = title.includes(searchValue) || author.includes(searchValue) || genre.includes(searchValue);
+
+                    // Adiciona ou remove a classe "hidden" com base na correspondência da pesquisa
+                    livro.classList.toggle('hidden', !isMatch);
+                });
+            });
+        });
 
 document.addEventListener('DOMContentLoaded', function () {
-        // ... (seu código JavaScript existente) ...
 
         // Adiciona a função addBook ao evento de clique do botão Salvar
         const saveButton = document.getElementById('saveButton');
@@ -163,36 +280,39 @@ try {
     });
 
     if (response.ok) {
-        const result = await response.json();
+    const result = await response.json();
 
-        if (result.status === 'success') {
-            // Ocultar o modal
-            const addBookModal = new bootstrap.Modal(document.getElementById('addBookModal'));
-            addBookModal.hide();
+    // Ocultar o modal de criação de livro
+    const addBookModal = new bootstrap.Modal(document.getElementById('addBookModal'));
+    addBookModal.hide();
 
-            // Exibir a mensagem de sucesso
-            Swal.fire({
-                icon: 'success',
-                title: 'Livro criado com sucesso!',
-                showConfirmButton: false,
-                timer: 2000
-            });
+    if (result.status === 'success') {
+        // Exibir a mensagem de sucesso
+        Swal.fire({
+            icon: 'success',
+            title: 'Livro criado com sucesso!',
+            showConfirmButton: false,
+            timer: 2000
+        });
 
+        // Atraso de 2 segundos antes de recarregar a página
+        setTimeout(() => {
             // Recarregar a lista de livros (substitua o código abaixo com a lógica real para atualizar a lista)
-            location.reload(); // Isso recarregará a página inteira; você pode querer usar uma abordagem mais eficiente, como AJAX, para carregar apenas os novos dados.
-
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro na criação',
-                text: result.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+            // Isso recarregará a página inteira; você pode querer usar uma abordagem mais eficiente, como AJAX, para carregar apenas os novos dados.
+            location.reload();
+        }, 2000);
     } else {
-        console.error('Erro na requisição:', response.statusText);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro na criação',
+            text: result.message,
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
+} else {
+    console.error('Erro na requisição:', response.statusText);
+}
 } catch (error) {
     console.error('Erro:', error);
 }

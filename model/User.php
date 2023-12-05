@@ -40,7 +40,12 @@ Class User {
     public function create_api_token($login, $password){
         return md5($login.$password.rand().API_TOKEN_SALT);
       }
-
+      public function set_api_token($password){
+        if (strlen($password) < self::MIN_PASS_LEN)
+          throw new Exception('A senha deve ter no mínimo ' . self::MIN_PASS_LEN . ' caracteres.');
+  
+        $this->api_token = self::create_api_token($this->login, $password);
+      }
    
       public function create_password($login, $password){
         if (strlen($password) < self::MIN_PASS_LEN) {
@@ -52,7 +57,11 @@ Class User {
     public function to_array(){            
       return get_object_vars($this);    
     }
-
+    public function build($data){
+      $data['password'] = $this->create_password($data['login'], $data['password']);
+      $data['api_token'] = $this->create_api_token($data['login'], $data['password']);
+      return $this->to_object($data);
+    }
     public function create_user() {
 $Crud = new Crud();
 
@@ -69,8 +78,20 @@ $Crud = new Crud();
           throw new Exception("Erro ao criar usuário: " . $e->getMessage());
       }
   }
+  public function to_object($array){
+    $fields = array_keys(get_object_vars($this));
+    foreach ( $array as $key => $data ){
+      if ( in_array($key, $fields) ){          
+          $this->$key = $data;
+      }
+      
+    }
 
-
+    return $this;
+  }
+  public static function get_class_vars($object){
+    return array_keys(get_class_vars(get_class($object))); // $object
+  }
   public function get_user_by_credentials($conn, $login, $password) {
     $sql = "SELECT * FROM user WHERE login = ? AND password = ?";
     
@@ -130,9 +151,7 @@ public static function create_sql_filter($filters = []) {
 
   return ["where" => $where, "bind" => $bind];
 }
-public static function get_class_vars($object){
-  return array_keys(get_class_vars(get_class($object))); // $object
-}
+
 
 
 }

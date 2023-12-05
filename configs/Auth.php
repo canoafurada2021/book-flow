@@ -7,14 +7,15 @@ class Auth {
         $Crud = new Crud();
         $where = 'login = :login';
         $bind = [':login' => $login];
-    
+        
         $users = $Crud->read('user', $where, $bind);
-    
+        
         if (!empty($users)) {
             $user = $users[0]; // Pega o primeiro usuário (deve haver apenas um)
-    
-            // Verifica a senha diretamente
-            if ($user['password'] == $password) {
+            
+            // Verifica a senha usando password_verify
+            if (password_verify($password, $user['password'])) {
+                // Login bem-sucedido
                 return ['status' => 'success', 'message' => 'Login bem-sucedido'];
             } else {
                 return ['status' => 'error', 'message' => 'Login mal-sucedido'];
@@ -23,6 +24,7 @@ class Auth {
             return ['status' => 'error', 'message' => 'Usuário inexistente no sistema'];
         }
     }
+    
 
     public static function token_login($token){
         if ( empty($token) )

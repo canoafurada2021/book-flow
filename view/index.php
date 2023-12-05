@@ -59,17 +59,24 @@ include_once(__DIR__."/../model/Book.php");
 // $user_data = array(
 //     'name' => 'Nome do Usuário',
 //     'email' => 'usuario@example.com',
-//     'login' => 'patricia',
-//     'password' => 'Senha123', 
+//     'login' => 'tamires Pauli',
+//     'password' => 'Comando7028!', 
 // );
 
 // // Setando os dados do usuário
 // $User->set_name($user_data['name']);
 // $User->set_email($user_data['email']);
 // $User->set_login($user_data['login']);
-// $User->set_password($user_data['password']);
+
+// $hashed_password = password_hash($user_data['password'], PASSWORD_DEFAULT);
+// $User->set_password($hashed_password);
+
 // // Criando o usuário no banco de dados
-//     $User->create_user();
+
+// // Criando e atribuindo o api_token
+// $api_token = $User->create_api_token($user_data['login'], $user_data['password']);
+// $User->set_api_token($api_token);
+//   $User->create_user();
 
 // $Book = new Book();
 
